@@ -1,223 +1,120 @@
-Le jeu « Burnout or Billionaire » est un jeu de gestion/survie psychologique en HTML/CSS/JavaScript où le joueur doit équilibrer :
+====================================================
+BURNOUT OR BILLIONAIRE - v0.1
+====================================================
+
+Auteur : li3z0r
+Version : 0.1
+Type : Jeu de gestion psychologique / simulation de vie
+Technologies : HTML / CSS / JavaScript
+Langue : Français
+
+----------------------------------------------------
+DESCRIPTION
+----------------------------------------------------
+
+Burnout or Billionaire est un jeu de simulation où
+le joueur doit survivre au quotidien en équilibrant :
+
+- l'argent
+- l'énergie
+- la santé mentale
+
+Le but est de progresser financièrement sans tomber
+dans le burnout psychologique.
+
+Le jeu mélange :
+- gestion de ressources,
+- simulation sociale,
+- fatigue mentale,
+- critique de la routine moderne.
+
+----------------------------------------------------
+FONCTIONNALITÉS
+----------------------------------------------------
+
+✔ Système de temps dynamique
+✔ Gestion jour/nuit
+✔ Travail et heures supplémentaires
+✔ École du soir avec progression permanente
+✔ Gestion du sommeil
+✔ Activités sociales et loisirs
+✔ Système d’addiction / abus
+✔ Événements aléatoires
+✔ Avatar émotionnel dynamique
+✔ Animation de burnout
+✔ Journal d’événements narratif
+✔ Interface responsive
+
+----------------------------------------------------
+MÉCANIQUES PRINCIPALES
+----------------------------------------------------
+
+ARGENT :
+Permet d’acheter des activités et de progresser.
+
+ÉNERGIE :
+Représente la fatigue physique du personnage.
+
+SANTÉ MENTALE :
+Statistique principale à surveiller.
+Si elle atteint 0 → Burnout.
+
+----------------------------------------------------
+BURNOUT
+----------------------------------------------------
+
+Lorsque la santé mentale tombe à zéro :
+
+- le personnage entre en crise,
+- une animation de tension démarre,
+- le jeu bloque temporairement les actions,
+- le joueur subit des pénalités importantes.
+
+Le burnout entraîne :
+- perte d’argent,
+- perte de temps,
+- reset partiel des états mentaux.
+
+----------------------------------------------------
+COMMENT LANCER LE JEU
+----------------------------------------------------
+
+1. Télécharger le fichier HTML
+2. Ouvrir :
+   Bob-v0.1.html
+3. Jouer directement dans un navigateur web
+
+Aucune installation nécessaire.
+
+----------------------------------------------------
+CONSEILS
+----------------------------------------------------
+
+- Dormez régulièrement
+- Évitez les abus d’activités
+- Alternez travail et détente
+- Surveillez votre santé mentale
+- Investissez dans l’école du soir
+
+----------------------------------------------------
+FICHIERS
+----------------------------------------------------
 
-l’argent 💰,
-l’énergie ⚡,
-la santé mentale 🧠,
+Bob-v0.1.html
+README.txt
 
-tout en essayant d’éviter le burnout.
+----------------------------------------------------
+CRÉDITS
+----------------------------------------------------
 
-Le principe repose sur une boucle de vie quotidienne simulée heure par heure.
+Concept, design et développement :
+li3z0r
 
-Concept principal
+----------------------------------------------------
+VERSION
+----------------------------------------------------
 
-Le joueur incarne une personne prise dans une routine moderne :
+v0.1
+Première version jouable
 
-travailler pour gagner de l’argent,
-dépenser pour maintenir son moral,
-gérer sa fatigue,
-investir dans son avenir,
-éviter l’effondrement psychologique.
-
-Le jeu oppose volontairement :
-
-la recherche de richesse (“Billionaire”),
-et les conséquences mentales du surmenage (“Burnout”).
-Système de gameplay
-1. Gestion des statistiques
-
-Le jeu possède trois jauges principales :
-
-💰 Argent
-Sert à payer les activités.
-Augmente via le travail et les heures supplémentaires.
-Peut être amélioré indirectement grâce à l’école du soir.
-⚡ Énergie
-Représente la fatigue physique.
-Diminue avec le travail et certaines activités.
-Se recharge uniquement par le sommeil ou certaines activités.
-🧠 Santé mentale
-Indicateur psychologique principal.
-Baisse avec le travail excessif ou l’isolement.
-Monte grâce aux loisirs, sorties ou distractions.
-Boucle temporelle
-
-Le temps avance en heures :
-
-travail : +8h,
-cinéma : +2h,
-soirée : +4h,
-voyage : +48h, etc.
-
-Le jeu suit :
-
-les jours de la semaine,
-les horaires,
-les périodes de repos.
-
-Certaines actions dépendent du calendrier :
-
-pas de travail le week-end,
-week-end évasion uniquement jeudi/vendredi.
-Activités disponibles
-💼 Travail
-
-Le cœur économique du jeu.
-
-Jour de travail
-rapporte un salaire,
-consomme beaucoup d’énergie,
-réduit fortement la santé mentale.
-Heures supplémentaires
-plus rentables à court terme,
-très destructrices mentalement.
-
-Le jeu pousse volontairement le joueur vers un modèle toxique :
-plus on veut gagner, plus on s’épuise.
-
-Progression
-🎓 École du soir
-
-Système d’investissement long terme :
-
-coûte cher,
-fatigue énormément,
-augmente définitivement le salaire futur.
-
-C’est une mécanique de “grind” social réaliste :
-souffrir aujourd’hui pour gagner plus demain.
-
-Système d’addiction et d’abus
-
-Une des mécaniques les plus intéressantes du jeu.
-
-Chaque activité utilisée trop souvent perd en efficacité.
-
-Exemple :
-
-le café apporte moins de bonheur avec le temps,
-UberEats devient une mauvaise habitude,
-les sorties deviennent épuisantes,
-le CBD entraîne une “tolérance”.
-
-Le jeu applique :
-
-une diminution des bénéfices,
-des malus narratifs,
-des conséquences psychologiques.
-
-C’est une critique directe des mécanismes de compensation modernes.
-
-Système social
-📱 FB Rencontre
-
-Mini système aléatoire :
-
-matchs positifs,
-ghosting,
-arnaques,
-discussions inutiles,
-dates réussies.
-
-Les rejets répétés déclenchent des pénalités d’estime personnelle.
-
-Le jeu simule :
-
-la fatigue émotionnelle,
-la dépendance à la validation sociale,
-l’usure psychologique des applications de rencontre.
-Système de burnout
-
-La mécanique centrale du jeu.
-
-Quand la santé mentale tombe à 0 :
-
-le jeu se bloque,
-l’avatar tremble pendant 3 secondes,
-une animation de tension psychologique se déclenche,
-le personnage “craque” avec l’emoji 🤯,
-pénalités :
-perte d’argent,
-saut de plusieurs jours,
-reset partiel mental.
-
-Cette mise en scène est particulièrement réussie :
-
-le délai avant l’explosion rend le burnout plus dramatique,
-le tremblement horizontal crée une sensation d’anxiété,
-le joueur voit le craquage arriver sans pouvoir agir.
-Avatar émotionnel dynamique
-
-Le personnage change d’émotion selon les statistiques :
-
-🤩 : très heureux et énergique,
-🙂 : état stable,
-🥱 : fatigue,
-😭 : détresse mentale,
-😫 : fatigue + dépression,
-🤯 : burnout.
-
-L’avatar agit comme un retour visuel immédiat sur l’état psychologique du personnage.
-
-Journal narratif
-
-Le jeu possède un log dynamique :
-
-événements horodatés,
-alertes psychologiques,
-conséquences des abus,
-commentaires narratifs.
-
-Cela transforme les statistiques en narration personnelle.
-
-Exemple :
-
-“Stress financier monte”
-“Isolement grandissant”
-“Tolérance accrue”
-“Fuite de la réalité”
-
-Le ton rappelle :
-
-les jeux de simulation de vie,
-les critiques sociales modernes,
-les mécaniques de survival management.
-Direction artistique
-
-Le style visuel :
-
-sombre,
-minimaliste,
-néon léger,
-ambiance “fatigue urbaine”.
-
-Palette :
-
-gris foncé,
-jaune stress/travail,
-rouge danger,
-bleu fatigue.
-
-L’interface ressemble à :
-
-un tableau de bord mental,
-une application de productivité dystopique.
-Ce que le jeu raconte réellement
-
-Sous sa forme simple, le jeu est une satire :
-
-du capitalisme moderne,
-de l’hyperproductivité,
-du burnout,
-des distractions numériques,
-des addictions de confort,
-de la recherche d’équilibre impossible.
-
-Le joueur comprend rapidement :
-
-travailler détruit le mental,
-se distraire coûte de l’argent,
-ne rien faire détruit aussi le moral,
-il n’existe pas de stratégie parfaite.
-
-C’est ce qui rend le concept intéressant :
-le jeu transforme la gestion de ressources en critique sociale psychologique.
+====================================================
