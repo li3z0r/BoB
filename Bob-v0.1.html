@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Burnout or Billionaire - v0.1</title>
+<style>
+    body { 
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+        background-color: #1e1e24; 
+        color: #f5f5f6; 
+        margin: 0; 
+        padding: 20px; 
+        display: flex; 
+        justify-content: center; 
+    }
+    #game-container { 
+        background: #2b2b36; 
+        padding: 20px; 
+        border-radius: 10px; 
+        width: 100%; 
+        max-width: 900px; 
+        box-shadow: 0 4px 15px rgba(0,0,0,0.5); 
+    }
+    h1 { text-align: center; color: #ffca3a; margin-top: 0; font-size: 1.8em; }
+    
+    .time-display {
+        text-align: center;
+        background: #3a3a48;
+        padding: 10px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-size: 1.2em;
+        font-weight: bold;
+        color: #fff;
+        border-bottom: 3px solid #ffca3a;
+    }
+
+    .stats { 
+        display: flex; 
+        flex-direction: row; 
+        align-items: center;
+        background: #1e1e24; 
+        padding: 15px; 
+        border-radius: 8px; 
+        margin-bottom: 20px; 
+        font-weight: bold; 
+    }
+
+    .stats-list {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        flex: 1; 
+        border-right: 2px solid #3a3a48; 
+        padding-right: 15px;
+    }
+
+    .avatar-container {
+        width: 100px; 
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding-left: 15px;
+    }
+
+    .avatar {
+        font-size: 3.5em; 
+        transition: opacity 0.2s ease-in-out, transform 0.2s ease;
+        text-shadow: 0 4px 10px rgba(0,0,0,0.4);
+    }
+
+    /* Nouvelle animation de tension horizontale */
+    @keyframes tension-horizontal {
+        0% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        50% { transform: translateX(0); }
+        75% { transform: translateX(5px); }
+        100% { transform: translateX(0); }
+    }
+
+    .tension {
+        animation: tension-horizontal 0.12s ease-in-out infinite;
+        /* On désactive les transitions de base pendant l'animation pour éviter les saccades */
+        transition: none !important; 
+    }
+    
+    .stat-row { display: flex; align-items: center; justify-content: space-between; }
+    .stat-label { width: 35%; font-size: 0.9em; }
+
+    .gauge-container {
+        width: 60%;
+        background: #111;
+        height: 25px;
+        border-radius: 12px;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid #444;
+    }
+
+    .gauge-bar {
+        height: 100%;
+        width: 0%;
+        transition: width 0.4s ease-in-out, background-color 0.4s;
+    }
+
+    .gauge-text {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        text-align: center;
+        line-height: 25px;
+        font-size: 0.85em;
+        color: #fff;
+        text-shadow: 1px 1px 2px #000;
+        z-index: 2;
+    }
+
+    #bar-argent { background-color: #8ac926; }
+    #bar-energie { background-color: #1982c4; }
+    #bar-bonheur { background-color: #ff595e; }
+
+    .actions-grid { 
+        display: grid; 
+        grid-template-columns: 1fr 1fr 1fr; 
+        gap: 10px; 
+        margin-bottom: 20px; 
+    }
+    button { 
+        background: #3a3a48; 
+        color: #fff; 
+        border: 1px solid #555; 
+        padding: 12px; 
+        border-radius: 5px; 
+        cursor: pointer; 
+        font-size: 0.82em; 
+        transition: 0.2s; 
+        text-align: left;
+    }
+    button:hover:not(:disabled) { background: #555568; transform: translateY(-2px); }
+    
+    /* État désactivé pour bloquer le jeu pendant le burnout */
+    button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none !important;
+        border-color: #333;
+    }
+    
+    .btn-work { border-left: 5px solid #ffca3a; }
+    .btn-spend { border-left: 5px solid #ff595e; }
+    .btn-special { border-left: 5px solid #8ac926; }
+    .btn-social { border-left: 5px solid #d90429; }
+    
+    .btn-sleep { 
+        border-left: 5px solid #1982c4; 
+        grid-column: span 3; 
+        text-align: center;
+        background: #233e5c;
+        font-weight: bold;
+    }
+    
+    #log { 
+        background: #111; 
+        padding: 15px; 
+        border-radius: 5px; 
+        height: 200px; 
+        overflow-y: auto; 
+        font-family: monospace; 
+        font-size: 0.9em; 
+    }
+    #log p { margin: 5px 0; border-bottom: 1px solid #333; padding-bottom: 5px; }
+    .log-alert { color: #ff595e; font-weight: bold; }
+    .log-time { color: #ffca3a; }
+    .log-abuse { color: #f77f00; font-style: italic; }
+</style>
+</head>
+<body>
+
+<div id="game-container">
+    <h1>Burnout or Billionaire</h1>
+    
+    <div class="time-display" id="time-display">Jour 1 | Lundi - 08:00</div>
+
+    <div class="stats">
+        <div class="stats-list">
+            <div class="stat-row">
+                <div class="stat-label">Compte en banque</div>
+                <div class="gauge-container">
+                    <div class="gauge-bar" id="bar-argent"></div>
+                    <div class="gauge-text" id="argent">0 €</div>
+                </div>
+            </div>
+            <div class="stat-row">
+                <div class="stat-label">Énergie ⚡</div>
+                <div class="gauge-container">
+                    <div class="gauge-bar" id="bar-energie"></div>
+                    <div class="gauge-text" id="energie">100 / 100</div>
+                </div>
+            </div>
+            <div class="stat-row">
+                <div class="stat-label">Santé Mentale 🧠</div>
+                <div class="gauge-container">
+                    <div class="gauge-bar" id="bar-bonheur"></div>
+                    <div class="gauge-text" id="bonheur">50 / 100</div>
+                </div>
+            </div>
+        </div>
+        <div class="avatar-container">
+            <div id="avatar-face" class="avatar">🙂</div>
+        </div>
+    </div>
+
+    <div class="actions-grid">
+        <button class="btn-work" onclick="travailler()">💼 Jour de travail (8h)<br><i>Salaire évolutif, -40⚡, -20🧠</i></button>
+        <button class="btn-work" onclick="heuresSup()">📈 Heures supp' (3h)<br><i>+45€, -30⚡, -25🧠</i></button>
+        <button class="btn-special" onclick="ecoleSoir()">🎓 École du soir (4h)<br><i>-250€, -40⚡, +20€ en Bonus</i></button>
+        
+        <button class="btn-spend" onclick="depenser(5, 10, 1, 'Café', -5)">☕ Café (1h)<br><i>-5€, +10🧠, -5⚡</i></button>
+        <button class="btn-spend" onclick="depenser(30, 35, 1, 'UberEats', -15)">🍽️ UberEats (1h)<br><i>-30€, +35🧠, -15⚡</i></button>
+        <button class="btn-special" onclick="salleSport()">💪 Salle de sport (2h)<br><i>-60€, -30⚡, +15⚡Max</i></button>
+
+        <button class="btn-social" onclick="depenser(40, 45, 4, 'Soirée entre potes', -40)">💛 Sortie entre amis (4h)<br><i>-40€, +45🧠, -40⚡</i></button>
+        <button class="btn-spend" onclick="depenser(15, 20, 2, 'Cinéma', -10)">🎬 Cinéma (2h)<br><i>-15€, +20🧠, -10⚡</i></button>
+        <button class="btn-spend" onclick="weekendEvasion()">✈️ Week-end évasion (48h)<br><i>-200€, 🧠Max</i></button>
+
+        <button class="btn-social" onclick="facebookRencontre()">📱 FB Rencontre (2h)<br><i>Aléatoire €, -15⚡</i></button>
+        <button class="btn-spend" onclick="depenser(15, 25, 1, 'Smoothie Brandy', -20)">🍹 Smoothie Brandy (1h)<br><i>-15€, +25🧠, -20⚡</i></button>
+        <button class="btn-spend" onclick="depenser(25, 50, 1, 'CBD', -60)">🌿 CBD (1h)<br><i>-25€, +50🧠, -60⚡</i></button>
+        
+        <button class="btn-sleep" onclick="dormir()">🛏️ Dormir jusqu'à 08h00, restaure l'⚡ proportionnellement au temps de sommeil</button>
+    </div>
+
+    <div id="log"></div>
+</div>
+
+<script>
+    const joursSemaine = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"];
+    
+    // Initialisation
+    let stats = { 
+        jourTotal: 1, 
+        jourIndex: 0, 
+        heure: 8,
+        argent: 0, 
+        energie: 100, 
+        energieMax: 100,
+        bonheur: 50,
+        bonheurMax: 100
+    };
+
+    let bonus = { salaireSupp: 0 };
+    let limitesJour = { aTravaille: false, heuresSupSamedi: false };
+    
+    let compteursActions = {};
+    let joursSansTravailler = 0;
+    
+    // Flag global pour empêcher les actions pendant la crise de burnout
+    let isBurnoutActive = false;
+
+    function formatHeure(h) { return (h < 10 ? '0' + h : h) + ':00'; }
+
+    // Fonction utilitaire pour bloquer/débloquer l'interface
+    function disableAllButtons(state) {
+        document.querySelectorAll('button').forEach(btn => btn.disabled = state);
+    }
+
+    function avancerTemps(duree) {
+        stats.heure += duree;
+        while (stats.heure >= 24) {
+            stats.heure -= 24;
+            
+            if (!limitesJour.aTravaille) {
+                joursSansTravailler++;
+                if (joursSansTravailler >= 3) {
+                    let malusInactivite = Math.min(40, (joursSansTravailler - 2) * 10);
+                    stats.bonheur -= malusInactivite;
+                    
+                    let msgPsy = "";
+                    if (joursSansTravailler === 3) msgPsy = "Le stress financier monte. L'inactivité vous fait perdre vos repères.";
+                    else if (joursSansTravailler === 4) msgPsy = "Isolement grandissant et culpabilité. La sédentarité pèse lourd.";
+                    else msgPsy = "Anxiété profonde. Vous perdez toute motivation et vous sentez déconnecté de la société.";
+
+                    logMessage(`🚨 Inactivité prolongée (${joursSansTravailler} jours) : -${malusInactivite}🧠. ${msgPsy}`, true);
+                }
+            }
+            
+            for (let action in compteursActions) {
+                if (compteursActions[action] > 0) {
+                    compteursActions[action]--;
+                }
+            }
+
+            stats.jourIndex = (stats.jourIndex + 1) % 7;
+            stats.jourTotal++;
+            limitesJour.aTravaille = false;
+            limitesJour.heuresSupSamedi = false;
+        }
+    }
+
+    function updateAvatar() {
+        if (isBurnoutActive) return; // Ne met plus à jour si on est en séquence de burnout
+
+        const avatar = document.getElementById('avatar-face');
+        let newEmoji = "😐";
+
+        if (stats.bonheur < 30 && stats.energie < 30) {
+            newEmoji = "😫"; 
+        } else if (stats.bonheur < 30) {
+            newEmoji = "😭"; 
+        } else if (stats.energie < 30) {
+            newEmoji = "🥱"; 
+        } else if (stats.bonheur >= 75 && stats.energie >= 50) {
+            newEmoji = "🤩"; 
+        } else if (stats.bonheur >= 50) {
+            newEmoji = "🙂"; 
+        } else {
+            newEmoji = "😐"; 
+        }
+
+        if (avatar.innerText !== newEmoji) {
+            avatar.style.opacity = 0;
+            avatar.style.transform = "scale(0.8)";
+            
+            setTimeout(() => {
+                if (isBurnoutActive) return; // Sécurité si le burnout s'est déclenché entre temps
+                avatar.innerText = newEmoji;
+                avatar.style.opacity = 1;
+                avatar.style.transform = "scale(1)";
+            }, 200); 
+        }
+    }
+
+    function updateUI() {
+        // 1. Mise à jour des textes et des barres
+        document.getElementById('time-display').innerText = 
+            `Jour ${stats.jourTotal} | ${joursSemaine[stats.jourIndex]} - ${formatHeure(stats.heure)}`;
+
+        document.getElementById('argent').innerText = stats.argent + ' €';
+        document.getElementById('energie').innerText = `${Math.max(0, stats.energie)} / ${stats.energieMax}`;
+        document.getElementById('bonheur').innerText = `${Math.max(0, stats.bonheur)} / ${stats.bonheurMax}`;
+        
+        document.getElementById('bar-argent').style.width = Math.min(100, (stats.argent / 1500) * 100) + '%';
+        document.getElementById('bar-energie').style.width = Math.min(100, (stats.energie / stats.energieMax) * 100) + '%';
+        document.getElementById('bar-bonheur').style.width = Math.min(100, (stats.bonheur / stats.bonheurMax) * 100) + '%';
+
+        let barB = document.getElementById('bar-bonheur');
+        if(stats.bonheur > 60) barB.style.backgroundColor = "#8ac926";
+        else if(stats.bonheur > 30) barB.style.backgroundColor = "#ffca3a";
+        else barB.style.backgroundColor = "#ff595e";
+
+        // 2. Gestion et Séquence du Burnout
+        if (stats.bonheur <= 0 && !isBurnoutActive) {
+            isBurnoutActive = true;
+            disableAllButtons(true); // Bloque le jeu
+            logMessage("⚠️ La pression est insoutenable... Rupture mentale imminente !", true);
+            
+            const avatar = document.getElementById('avatar-face');
+            
+            // On conserve l'émotion actuelle et on applique la tension (tremblement)
+            avatar.classList.add('tension');
+
+            // On attend 3 secondes pour construire la tension
+            setTimeout(() => {
+                // Arrêt de l'animation
+                avatar.classList.remove('tension');
+                
+                // Transition d'effacement fluide
+                avatar.style.opacity = 0;
+                avatar.style.transform = "scale(0.8)";
+                
+                setTimeout(() => {
+                    // Apparition du Burnout
+                    avatar.innerText = "🤯";
+                    avatar.style.opacity = 1;
+                    avatar.style.transform = "scale(1)";
+                    
+                    // On laisse le joueur observer le "craquage" pendant 2,5 secondes avant de purger ses stats
+                    setTimeout(() => {
+                        logMessage("🚨 BURNOUT TOTAL ! Vous craquez sous la pression.", true);
+                        stats.argent = Math.max(0, stats.argent - 150);
+                        stats.bonheur = 40;
+                        stats.energie = stats.energieMax;
+                        joursSansTravailler = 0; 
+                        compteursActions = {}; 
+                        avancerTemps(72);
+                        stats.heure = 8;
+                        
+                        // Fin de la crise, relance de l'interface
+                        isBurnoutActive = false;
+                        disableAllButtons(false);
+                        updateUI(); 
+                    }, 2500);
+                }, 200); // 200ms pour caler avec la durée de transition CSS
+                
+            }, 3000); // Durée de la phase de tremblement
+
+            return; // On arrête la mise à jour normale de l'UI ici
+        }
+
+        // 3. Mise à jour de l'avatar normal si tout va bien
+        if (!isBurnoutActive) {
+            updateAvatar();
+        }
+    }
+
+    function logMessage(msg, isAlert = false) {
+        const logDiv = document.getElementById('log');
+        const newP = document.createElement('p');
+        if (isAlert) newP.className = 'log-alert';
+        newP.innerHTML = `<span class="log-time">[${joursSemaine[stats.jourIndex]} ${formatHeure(stats.heure)}]</span> ${msg}`;
+        logDiv.prepend(newP); 
+    }
+
+    function travailler() {
+        if (stats.energie === 0 || stats.energie < 40) { logMessage("❌ Énergie insuffisante (besoin de 40⚡).", true); return; }
+        if (stats.bonheur === 0 || stats.bonheur < 20) { logMessage("❌ Santé mentale trop basse (besoin de 20🧠).", true); return; }
+        if (stats.jourIndex >= 5) { logMessage("❌ Pas de travail le week-end.", true); return; }
+        if (limitesJour.aTravaille) { logMessage("❌ Déjà travaillé aujourd'hui.", true); return; }
+
+        let salaire = 60 + bonus.salaireSupp;
+        limitesJour.aTravaille = true;
+        joursSansTravailler = 0; 
+        stats.energie -= 40;
+        stats.argent += salaire;
+        stats.bonheur -= 20;
+        avancerTemps(8);
+        logMessage(`💼 Travail : +${salaire}€ (Salaire de base + bonus école).`);
+        updateUI();
+    }
+
+    function heuresSup() {
+        if (stats.energie === 0 || stats.energie < 30) { logMessage("❌ Énergie insuffisante (besoin de 30⚡).", true); return; }
+        if (stats.bonheur === 0 || stats.bonheur < 25) { logMessage("❌ Santé mentale trop basse (besoin de 25🧠).", true); return; }
+        if (stats.jourIndex === 6) { logMessage("❌ Pas de travail le dimanche.", true); return; }
+        if (stats.jourIndex === 5) {
+            if (limitesJour.heuresSupSamedi) { logMessage("❌ Déjà fait.", true); return; }
+            limitesJour.heuresSupSamedi = true;
+            joursSansTravailler = 0;
+        } else if (!limitesJour.aTravaille) {
+            logMessage("❌ Travaillez d'abord votre journée normale.", true); return;
+        }
+        
+        stats.energie -= 30;
+        stats.argent += 45;
+        stats.bonheur -= 25;
+        avancerTemps(3);
+        logMessage("📈 Heures supp' : +45€.");
+        updateUI();
+    }
+
+    function ecoleSoir() {
+        if (stats.argent === 0 || stats.argent < 250) { logMessage("❌ Fonds insuffisants (besoin de 250€).", true); return; }
+        if (stats.energie === 0 || stats.energie < 40) { logMessage("❌ Énergie insuffisante (besoin de 40⚡).", true); return; }
+        
+        stats.argent -= 250;
+        stats.energie -= 40;
+        bonus.salaireSupp += 20; 
+        avancerTemps(4);
+        logMessage("🎓 École du soir : Salaire augmenté de +20€ de façon permanente.");
+        updateUI();
+    }
+
+    function salleSport() {
+        if (stats.argent === 0 || stats.argent < 60) { logMessage("❌ Fonds insuffisants (besoin de 60€).", true); return; }
+        if (stats.energie === 0 || stats.energie < 30) { logMessage("❌ Énergie insuffisante (besoin de 30⚡).", true); return; }
+        
+        stats.argent -= 60;
+        stats.energie -= 30;
+        stats.energieMax += 15; 
+        avancerTemps(2);
+        logMessage("💪 Sport : Votre capacité d'énergie max augmente de +15 unités.");
+        updateUI();
+    }
+
+    function facebookRencontre() {
+        let coutEnergie = 15;
+        let desc = 'FB Rencontre';
+        
+        if (stats.energie === 0 || stats.energie < coutEnergie) { 
+            logMessage(`❌ Énergie insuffisante pour swiper (besoin de ${coutEnergie}⚡).`, true); 
+            return; 
+        }
+
+        stats.energie -= coutEnergie;
+        avancerTemps(2);
+
+        const events = [
+            { nom: "Match sympa", argent: 0, bonheur: 20 },
+            { nom: "Ghosté(e) après discussion", argent: 0, bonheur: -15 },
+            { nom: "Super Date au resto", argent: -30, bonheur: 40 },
+            { nom: "Arnaque au brouteur", argent: -50, bonheur: -20 },
+            { nom: "Discussion interminable sans suite", argent: 0, bonheur: 0 }
+        ];
+
+        let evt = events[Math.floor(Math.random() * events.length)];
+        
+        if (evt.argent < 0 && stats.argent < Math.abs(evt.argent)) {
+            evt = { nom: "Match annulé (pas assez d'argent pour la sortie)", argent: 0, bonheur: -10 };
+        }
+
+        let isPositive = evt.bonheur > 0;
+
+        if (!compteursActions[desc]) compteursActions[desc] = 0;
+        let niveauAbus = compteursActions[desc];
+        let abusMalus = 0;
+
+        if (!isPositive) {
+            compteursActions[desc] = Math.min(5, compteursActions[desc] + 1);
+            abusMalus = niveauAbus * 5; 
+            stats.bonheur = Math.max(0, stats.bonheur - abusMalus);
+        }
+
+        stats.argent += evt.argent; 
+        stats.bonheur = Math.min(stats.bonheurMax, Math.max(0, stats.bonheur + evt.bonheur));
+
+        let message = `📱 FB Rencontre : ${evt.nom}. ${evt.argent !== 0 ? evt.argent + '€, ' : ''}${evt.bonheur > 0 ? '+' : ''}${evt.bonheur !== 0 ? evt.bonheur + '🧠, ' : ''}-${coutEnergie}⚡.`;
+
+        if (!isPositive && niveauAbus > 0) {
+            message += ` <span class="log-abuse">⚠️ Abus ! Votre estime de vous baisse face aux rejets répétés (-${abusMalus}🧠).</span>`;
+        }
+
+        logMessage(message);
+        updateUI();
+    }
+
+    function depenser(prix, gainB, duree, desc, baseCoutE) {
+        if (!compteursActions[desc]) compteursActions[desc] = 0;
+        let niveauAbus = compteursActions[desc];
+        
+        let actuelGainB = Math.max(0, gainB - (niveauAbus * 5));
+        let actuelCoutE = baseCoutE - (niveauAbus * 10);
+        let coutEnergieAbs = Math.abs(actuelCoutE);
+
+        if (stats.argent === 0 || stats.argent < prix) { 
+            logMessage(`❌ Fonds insuffisants pour cette action (besoin de ${prix}€).`, true); 
+            return; 
+        }
+        if (stats.energie === 0 || stats.energie < coutEnergieAbs) { 
+            logMessage(`❌ Énergie insuffisante pour cette action (besoin de ${coutEnergieAbs}⚡).`, true); 
+            return; 
+        }
+
+        stats.argent -= prix;
+        stats.bonheur = Math.min(stats.bonheurMax, stats.bonheur + actuelGainB);
+        stats.energie = Math.max(0, stats.energie + actuelCoutE); 
+        
+        compteursActions[desc] = Math.min(5, compteursActions[desc] + 1); 
+        
+        avancerTemps(duree);
+
+        let nomAffiche = desc;
+        if (desc === 'Café') {
+            const cafes = ['Espresso', 'Latte', 'Cappuccino', 'Café glacé', 'Moka'];
+            nomAffiche = `Café (${cafes[Math.floor(Math.random() * cafes.length)]})`;
+        } else if (desc === 'UberEats') {
+            const plats = ['Burger', 'Sushi', 'Tacos', 'Pizza', 'Poke Bowl', 'Kebab'];
+            nomAffiche = `UberEats (${plats[Math.floor(Math.random() * plats.length)]})`;
+        }
+        
+        let message = `💸 ${nomAffiche} : -${prix}€, +${actuelGainB}🧠, ${actuelCoutE}⚡.`;
+        
+        if (niveauAbus > 0) {
+            const messagesNarratifs = {
+                "Café": "Excès de caféine ! Palpitations, nervosité et crash d'énergie imminent.",
+                "Cinéma": "Fuite de la réalité. Vous passez votre vie dans les salles obscures, le réveil est brutal.",
+                "UberEats": "Dépendance au confort. Sensation de lourdeur, digestion difficile et dépenses inutiles.",
+                "CBD": "Tolérance accrue. Brouillard mental persistant et somnolence excessive.",
+                "Smoothie Brandy": "L'excès de sucre et d'alcool doux vous retourne l'estomac. Maux de tête en approche.",
+                "Soirée entre potes": "Vous sortez trop. Le manque de repos régulier commence à peser lourdement sur votre organisme."
+            };
+            let alerte = messagesNarratifs[desc] || "Vous abusez de cette action. Les effets s'inversent.";
+            message += ` <span class="log-abuse">⚠️ Abus ! ${alerte}</span>`;
+        }
+        
+        logMessage(message);
+        updateUI();
+    }
+
+    function weekendEvasion() {
+        if (stats.argent === 0 || stats.argent < 200) { logMessage("❌ Fonds insuffisants (besoin de 200€).", true); return; }
+        if (stats.jourIndex < 3 || stats.jourIndex > 4) { logMessage("❌ Seulement Jeudi ou Vendredi.", true); return; }
+        
+        stats.argent -= 200;
+        stats.bonheur = stats.bonheurMax;
+        stats.energie = stats.energieMax;
+        
+        joursSansTravailler = 0;
+        compteursActions = {};
+        
+        avancerTemps(48);
+        logMessage("✈️ Voyage : Vous décompressez totalement ! Santé/Énergie Max, stress à zéro.");
+        updateUI();
+    }
+
+    function dormir() {
+        let heures;
+        if (stats.heure < 8) heures = 8 - stats.heure;
+        else heures = (24 - stats.heure) + 8;
+        
+        let gainE = Math.round((heures / 8) * stats.energieMax);
+        stats.energie = Math.min(stats.energieMax, gainE);
+        
+        avancerTemps(heures);
+        logMessage(`🛏️ Sommeil : ${heures}h. Énergie restaurée à ${stats.energie} unités.`);
+        updateUI();
+    }
+
+    updateUI();
+    logMessage("Début de la partie. Attention à la routine : variez vos activités pour éviter l'épuisement !");
+</script>
+</body>
+</html>
